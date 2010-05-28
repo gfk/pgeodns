@@ -28,12 +28,12 @@ sub collect_query_counts {
       ParaDNS->new(
         callback => sub {
             if ($_[0] =~ m/q: (\d+)/) {
-              my $queries = $1;
-              my $elapsed = time - $time;
-              #print "$ns: Q:$queries E:$elapsed\n";
-              my $c = $config->{servers}->{$ns};
-              my $ip24 = $c->{ip24};
-              $sth_insert->execute($ip24, int $time, $queries, $elapsed);
+                my $queries = $1;
+                my $elapsed = time - $time;
+                #print "$ns: Q:$queries E:$elapsed\n";
+                my $c = $config->{servers}->{$ns};
+                my $ip24 = $c->{ip24};
+                $sth_insert->execute($ip24, int $time, $queries, $elapsed);
             }
             #print STDERR "$ns: $_[0]\n";
         },

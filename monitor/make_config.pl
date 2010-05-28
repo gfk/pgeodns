@@ -11,15 +11,15 @@ my $config_file = 'servers.json';
 write_config_file();
 
 sub write_config_file {
-	my %ns = find_dns_servers();
-	
-	my $json;
-	$json->{zones} = \@domains;
-	$json->{servers} = \%ns;
-	
-	open my $json_fh, '>', $config_file or die "Could not open $config_file: $!\n";
-	print $json_fh JSON->new->pretty(1)->encode($json);
-	close $json_fh;
+    my %ns = find_dns_servers();
+    
+    my $json;
+    $json->{zones} = \@domains;
+    $json->{servers} = \%ns;
+    
+    open my $json_fh, '>', $config_file or die "Could not open $config_file: $!\n";
+    print $json_fh JSON->new->pretty(1)->encode($json);
+    close $json_fh;
 }
 
 sub find_dns_servers {

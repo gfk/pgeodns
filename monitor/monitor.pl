@@ -26,28 +26,28 @@ sub collect_query_counts {
            values (?,?,?,?)]
         );
 
-		my %sockets; my $time = time;
+    my %sockets; my $time = time;
     for my $ns (keys %{$config->{servers}}) {
-    	$resolv->nameservers($ns);
-    	$sockets{$ns} = $resolv->bgsend('status.pool.ntp.org', 'TXT');
+        $resolv->nameservers($ns);
+        $sockets{$ns} = $resolv->bgsend('status.pool.ntp.org', 'TXT');
     }
     
     for my $i (1 .. 5) {
-    	for my $ns (sort keys %sockets) {
-    		my $socket = $sockets{$ns};
-    		if ($socket && $resolv->bgisready($socket)) {
-    			my $packet = $resolv->bgread($socket);
-    			my $elapsed = time - $time; # Not that precise...
-    			my ($txt) = $packet && grep { $_->type eq 'TXT' } $packet->answer;
-    			delete $sockets{$ns};
-    			
-          #print $txt->rdatastr, "\n";
-          my ($queries) = ($txt->rdatastr =~ m/q: (\d+)/)[0];
-          #print "$ns: Q:$queries E:$elapsed\n";
-          my $c = $config->{servers}->{$ns};
-          my $ip24 = $c->{ip24};
-          $sth_insert->execute($ip24, int $time, $queries, $elapsed);
-    		}
+        for my $ns (sort keys %sockets) {
+            my $socket = $sockets{$ns};
+            if ($socket && $resolv->bgisready($socket)) {
+                my $packet = $resolv->bgread($socket);
+                my $elapsed = time - $time; # Not that precise...
+                my ($txt) = $packet && grep { $_->type eq 'TXT' } $packet->answer;
+                delete $sockets{$ns};
+                
+                #print $txt->rdatastr, "\n";
+                my ($queries) = ($txt->rdatastr =~ m/q: (\d+)/)[0];
+                #print "$ns: Q:$queries E:$elapsed\n";
+                my $c = $config->{servers}->{$ns};
+                my $ip24 = $c->{ip24};
+                $sth_insert->execute($ip24, int $time, $queries, $elapsed);
+            }
       }
       
       last unless %sockets;
